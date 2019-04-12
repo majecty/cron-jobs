@@ -62,22 +62,22 @@ export function createTimelock(
         case "block":
             return {
                 type: "block",
-                value: currentBlock.number + 10
+                value: currentBlock.number + 30
             };
         case "blockAge":
             return {
                 type: "blockAge",
-                value: 10
+                value: 30
             };
         case "time":
             return {
                 type: "time",
-                value: currentBlock.timestamp + 30
+                value: currentBlock.timestamp + 300
             };
         case "timeAge":
             return {
                 type: "timeAge",
-                value: 30
+                value: 300
             };
     }
 }

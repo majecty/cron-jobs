@@ -161,18 +161,18 @@ export default class UTXOSet {
             let parameters: Buffer[] = [];
             switch (index) {
                 case TIMELOCK_BLOCK:
-                    parameters = [u64ToBuffer(this.currentBlock.number + 10)];
+                    parameters = [u64ToBuffer(this.currentBlock.number + 30)];
                     break;
                 case TIMELOCK_BLOCK_AGE:
-                    parameters = [u64ToBuffer(10)];
+                    parameters = [u64ToBuffer(30)];
                     break;
                 case TIMELOCK_TIME:
                     parameters = [
-                        u64ToBuffer(this.currentBlock.timestamp + 30)
+                        u64ToBuffer(this.currentBlock.timestamp + 300)
                     ];
                     break;
                 case TIMELOCK_TIME_AGE:
-                    parameters = [u64ToBuffer(30)];
+                    parameters = [u64ToBuffer(300)];
                     break;
             }
             return new AssetTransferOutput({
