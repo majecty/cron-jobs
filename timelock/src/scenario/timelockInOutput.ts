@@ -43,27 +43,24 @@ export async function run(
         const validTxHash = await codeChain.sendTransaction(validTransaction);
         console.log(`Send validTxHash, Hash: ${validTxHash.toString()}`);
 
+        const leastBlock = await codeChain.waitFutureBlock({
+            canHandle: validTransaction
+        });
+        console.log(
+            `leastBlockHeight: ${leastBlock.number} ${leastBlock.timestamp}`
+        );
+
         await codeChain.waitTransactionMined(validTxHash);
         const containsInvalid = await codeChain.containsTransaction(
             invalidTxHash
         );
         chai.assert.strictEqual(false, containsInvalid);
 
-        const leastBlock = await codeChain.waitFutureBlock({
-            canHandle: validTransaction
-        });
-
         const insertedBlock = await codeChain.getBlockOfTransaction(
             validTransaction
         );
 
         console.log("Timelock success");
-        console.log(
-            `StartBlockHeight: ${startBlock.number} ${startBlock.timestamp}`
-        );
-        console.log(
-            `leastBlockHeight: ${leastBlock.number} ${leastBlock.timestamp}`
-        );
         console.log(
             `InsertedBlockHeight: ${insertedBlock.number} ${
                 insertedBlock.timestamp
