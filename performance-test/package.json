@@ -1,0 +1,38 @@
+{
+  "name": "performance-test",
+  "version": "1.0.0",
+  "description": "Simple performance test tool for CodeChain",
+  "main": "build/index.js",
+  "scripts": {
+    "start": "ts-node ./index.ts",
+    "build": "tsc --incremental -p .",
+    "test": "npm run lint",
+    "lint": "tslint -p . && prettier '**/*.ts' -l",
+    "fmt": "tslint -p . --fix && prettier '**/*ts' --write"
+  },
+  "author": "CodeChain Team <hi@codechain.io>",
+  "license": "ISC",
+  "dependencies": {
+    "@slack/client": "^4.12.0",
+    "@types/lodash": "^4.14.123",
+    "bignumber.js": "^7.2.1",
+    "chai": "^4.2.0",
+    "codechain-sdk": "^1.1.0",
+    "config": "^2.0.1",
+    "lodash": "^4.17.14",
+    "request-json": "^0.6.4",
+    "request-promise-native": "^1.0.5"
+  },
+  "devDependencies": {
+    "@types/chai": "^4.1.7",
+    "@types/config": "^0.0.34",
+    "@types/node": "^10.9.1",
+    "@types/request": "^2.47.1",
+    "@types/request-promise-native": "^1.0.15",
+    "prettier": "^1.18.2",
+    "ts-node": "^8.3.0",
+    "tslint": "^5.17.0",
+    "tslint-config-prettier": "^1.18.0",
+    "typescript": "^3.5.2"
+  }
+}
