@@ -38,10 +38,63 @@ export default class UTXOs {
         }
     };
 
+    public create100Mints = async () => {
+        const assetOwnerKey = await this.keyStore.asset.createKey();
+        this.assetOwner = AssetAddress.fromTypeAndPayload(1, assetOwnerKey, {
+            networkId
+        });
+        {
+            await this.mint100Assets();
+        }
+    };
+
     public popPBKHAsset = (): Asset => {
         const asset = this.pbkhAssets.pop();
         assert.isDefined(asset);
         return asset as Asset;
+    };
+
+    public mint100Assets = async (): Promise<void> => {
+        const txHashes = [];
+        const seq = await getCurrentSeq(this.sdk, faucetAddress);
+        for (let index = 0; index < 100; index++) {
+            const assetScheme = this.sdk.core.createAssetScheme({
+                shardId: 0,
+                metadata: JSON.stringify({
+                    name: `Gold For Performance Test ${Math.random()}`,
+                    description: `An asset to test performance ${Math.random()}`,
+                    icon_url: "https://static.majecty.tech/images/clock512.png"
+                }),
+                supply: 100
+            });
+
+            const transaction = this.sdk.core.createMintAssetTransaction({
+                scheme: assetScheme,
+                recipient: this.assetOwner!
+            });
+
+            const signedTransaction = await this.sdk.key.signTransaction(
+                transaction,
+                {
+                    account: faucetAddress,
+                    fee: 100_000,
+                    seq: seq + index
+                }
+            );
+
+            const txHash = await this.sdk.rpc.chain.sendSignedTransaction(
+                signedTransaction
+            );
+            txHashes.push(txHash);
+        }
+
+        for (const txHash of txHashes) {
+            await waitContainTransacitonSuccess(
+                this.sdk,
+                txHash,
+                TRANSACTION_TIMEOUT
+            );
+        }
     };
 
     private mintAsset = async (): Promise<Asset> => {

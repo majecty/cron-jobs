@@ -2,7 +2,11 @@ import { SDK } from "codechain-sdk";
 import { Block, H256, SignedTransaction } from "codechain-sdk/lib/core/classes";
 import { MemoryKeyStore } from "codechain-sdk/lib/key/MemoryKeyStore";
 import { TRANSACTION_TIMEOUT } from "./constant";
-import { getConfig, waitContainTransacitonSuccess } from "./util";
+import {
+    getConfig,
+    getCurrentSeq,
+    waitContainTransacitonSuccess
+} from "./util";
 import UTXOs from "./utxoSet";
 
 type NetworkId = "tc" | "wc";
@@ -33,6 +37,45 @@ export default class CodeChain {
         const utxoSet = new UTXOs(this.sdk, this.transientKeyStore);
         await utxoSet.create100UTXOs();
         return utxoSet;
+    };
+
+    public create100Mints = async (): Promise<void> => {
+        const utxoSet = new UTXOs(this.sdk, this.transientKeyStore);
+        await utxoSet.create100Mints();
+    };
+
+    public create100Payments = async (): Promise<void> => {
+        const faucetAddress = getConfig<string>("faucetAddress");
+        const txHashes = [];
+        const seq = await getCurrentSeq(this.sdk, faucetAddress);
+        for (let index = 0; index < 100; index++) {
+            const transaction = this.sdk.core.createPayTransaction({
+                recipient: faucetAddress,
+                quantity: 100
+            });
+
+            const signedTransaction = await this.sdk.key.signTransaction(
+                transaction,
+                {
+                    account: faucetAddress,
+                    fee: 100_000,
+                    seq: seq + index
+                }
+            );
+
+            const txHash = await this.sdk.rpc.chain.sendSignedTransaction(
+                signedTransaction
+            );
+            txHashes.push(txHash);
+        }
+
+        for (const txHash of txHashes) {
+            await waitContainTransacitonSuccess(
+                this.sdk,
+                txHash,
+                TRANSACTION_TIMEOUT
+            );
+        }
     };
 
     public sendTransaction(transaction: SignedTransaction): Promise<H256> {
